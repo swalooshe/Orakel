@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Das Orakel</title>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #1a1a24;
+      color: #ffffff;
+      text-align: center;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    /* Orakel-Bild */
+    .oracle-image {
+      max-width: 280px;
+      width: 100%;
+      height: auto;
+      border-radius: 50%;
+      box-shadow: 0 0 30px rgba(155, 89, 182, 0.5);
+      margin-bottom: 30px;
+      object-fit: cover;
+    }
+
+    /* Button */
+    button {
+      padding: 18px 36px;
+      font-size: 22px;
+      font-weight: bold;
+      border-radius: 50px;
+      border: 2px solid #9b59b6;
+      background: linear-gradient(135deg, #8e44ad, #3498db);
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+      transition: all 0.2s ease;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(155, 89, 182, 0.7);
+    }
+
+    button:active {
+      transform: translateY(1px);
+    }
+
+    /* Sperrt den Button, während das Orakel spricht */
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .status {
+      margin-top: 20px;
+      font-style: italic;
+      color: #b3a2c7;
+      min-height: 24px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 🖼️ BILD DER WEBSITE (Passe den Namen 'orakel.jpg' an dein Bild an) -->
+  <img src="orakel.jpg" alt="Das Orakel" class="oracle-image">
+
+  <!-- 🔮 BUTTON -->
+  <button id="oracleBtn" onclick="startOracle()">Das Orakel sagt...</button>
+
+  <div id="status" class="status"></div>
+
+  <script>
+    // =========================================================================
+    // STUFE 1: REAKTIONEN (11 Dateien)
+    // =========================================================================
+    const stufe1 = [
+      'reaktion1.mp3',
+      'reaktion2.mp3',
+      'reaktion3.mp3',
+      'reaktion4.mp3',
+      'reaktion5.mp3',
+      'reaktion6.mp3',
+      'reaktion7.mp3',
+      'reaktion8.mp3',
+      'reaktion9.mp3',
+      'reaktion10.mp3',
+      'reaktion11.mp3'
+    ];
+
+    // =========================================================================
+    // STUFE 2: ANTWORTEN (19 Dateien - Jede mit der Antwort-Ankündigung davor)
+    // Passe 'ankuendigung_antwort.mp3' an den exakten Dateinamen deiner Ankündigung an!
+    // =========================================================================
+    const stufe2 = [
+      { file: 'antwort1.mp3',  intro: 'ankuendigung_antwort.mp3' },
+      { file: 'antwort2.mp3',  intro: 'ankuendigung_antwort.mp3' },
+      { file: 'antwort3.mp3',  intro: 'ankuendigung_antwort.mp3' },
+      { file: 'antwort4.mp3',  intro: 'ankuendigung_antwort.mp3' },
+      { file: 'antwort5.mp3',  intro: 'ankuendigung_antwort.mp3' },
+      { file: 'antwort6.mp3',  intro: 'ankuendigung_antwort.mp3' },
+      { file: 'antwort7.mp3',  intro: 'ankuendigung_antwort.mp3' },
+      { file: 'antwort8.mp3',  intro: 'ankuendigung_antwort.mp3' },
+      { file: 'antwort9.mp3',  intro: 'ankuendigung_antwort.mp3' },
+      { file: 'antwort10.mp3', intro: 'ankuendigung_antwort.mp3' },
+      { file: 'antwort11.mp3', intro: 'ankuendigung_antwort.mp3' },
+      { file: 'antwort12.mp3', intro: 'ankuendigung_antwort.mp3' },
+      { file: 'antwort13.mp3', intro: 'ankuendigung_antwort.mp3' },
+      { file: 'antwort14.mp3', intro: 'ankuendigung_antwort.mp3' },
+      { file: 'antwort15.mp3', intro: 'ankuendigung_antwort.mp3' },
+      { file: 'antwort16.mp3', intro: 'ankuendigung_antwort.mp3' },
+      { file: 'antwort17.mp3', intro: 'ankuendigung_antwort.mp3' },
+      { file: 'antwort18.mp3', intro: 'ankuendigung_antwort.mp3' },
+      { file: 'antwort19.mp3', intro: 'ankuendigung_antwort.mp3' }
+    ];
+
+    // =========================================================================
+    // STUFE 3: ZUSÄTZE (3 normale Zusätze + 16 Weisheiten mit Intro)
+    // =========================================================================
+    const stufe3 = [
+      // 3 normale Zusätze (ohne Intro)
+      'zusatz1.mp3',
+      'zusatz2.mp3',
+      'zusatz3.mp3',
+
+      // 16 Weisheiten (mit dem Intro "hier_noch_eine_weisheit.mp3" davor)
+      { file: 'weisheit1.mp3',  intro: 'hier_noch_eine_weisheit.mp3' },
+      { file: 'weisheit2.mp3',  intro: 'hier_noch_eine_weisheit.mp3' },
+      { file: 'weisheit3.mp3',  intro: 'hier_noch_eine_weisheit.mp3' },
+      { file: 'weisheit4.mp3',  intro: 'hier_noch_eine_weisheit.mp3' },
+      { file: 'weisheit5.mp3',  intro: 'hier_noch_eine_weisheit.mp3' },
+      { file: 'weisheit6.mp3',  intro: 'hier_noch_eine_weisheit.mp3' },
+      { file: 'weisheit7.mp3',  intro: 'hier_noch_eine_weisheit.mp3' },
+      { file: 'weisheit8.mp3',  intro: 'hier_noch_eine_weisheit.mp3' },
+      { file: 'weisheit9.mp3',  intro: 'hier_noch_eine_weisheit.mp3' },
+      { file: 'weisheit10.mp3', intro: 'hier_noch_eine_weisheit.mp3' },
+      { file: 'weisheit11.mp3', intro: 'hier_noch_eine_weisheit.mp3' },
+      { file: 'weisheit12.mp3', intro: 'hier_noch_eine_weisheit.mp3' },
+      { file: 'weisheit13.mp3', intro: 'hier_noch_eine_weisheit.mp3' },
+      { file: 'weisheit14.mp3', intro: 'hier_noch_eine_weisheit.mp3' },
+      { file: 'weisheit15.mp3', intro: 'hier_noch_eine_weisheit.mp3' },
+      { file: 'weisheit16.mp3', intro: 'hier_noch_eine_weisheit.mp3' }
+    ];
+
+    let currentAudio = null;
+
+    // Hilfsfunktion: Fügt eine Spur ODER eine Kombination aus Intro + Datei zur Playlist hinzu
+    function addTrackToPlaylist(playlist, track) {
+      if (typeof track === 'string') {
+        playlist.push(track);
+      } else if (typeof track === 'object' && track !== null) {
+        if (track.intro) playlist.push(track.intro);
+        if (track.file) playlist.push(track.file);
+      }
+    }
+
+    function startOracle() {
+      const btn = document.getElementById('oracleBtn');
+      const status = document.getElementById('status');
+
+      btn.disabled = true;
+      status.innerText = "Das Orakel spricht...";
+
+      // Zufallsauswahl für alle 3 Stufen
+      const r1 = stufe1[Math.floor(Math.random() * stufe1.length)];
+      const r2 = stufe2[Math.floor(Math.random() * stufe2.length)];
+      const r3 = stufe3[Math.floor(Math.random() * stufe3.length)];
+
+      // Playlist schrittweise aufbauen
+      const playlist = [];
+      addTrackToPlaylist(playlist, r1); // Stufe 1: Reaktion
+      addTrackToPlaylist(playlist, r2); // Stufe 2: Antwort-Ankündigung + Antwort
+      addTrackToPlaylist(playlist, r3); // Stufe 3: Zusatz / Weisheits-Ankündigung + Weisheit
+
+      // Nacheinander abspielen
+      playSequence(playlist, 0, () => {
+        btn.disabled = false;
+        status.innerText = "";
+      });
+    }
+
+    function playSequence(playlist, index, onComplete) {
+      if (index >= playlist.length) {
+        if (onComplete) onComplete();
+        return;
+      }
+
+      currentAudio = new Audio(playlist[index]);
+      
+      currentAudio.onended = function() {
+        playSequence(playlist, index + 1, onComplete);
+      };
+
+      currentAudio.play().catch(error => {
+        console.error("Fehler beim Laden/Abspielen von: " + playlist[index], error);
+        // Falls eine Datei fehlt, einfach direkt zur nächsten weiterspringen
+        playSequence(playlist, index + 1, onComplete);
+      });
+    }
+  </script>
+</body>
+</html>
